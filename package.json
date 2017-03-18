@@ -1,0 +1,30 @@
+{
+    "name": "appm",
+    "version": "1.0.0",
+    "description": "An app package manager for Google Play",
+    "main": "apm",
+    "preferGlobal": true,
+    "bin": {
+      "appm": "appm"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/96aa48/appm.git"
+    },
+    "keywords": [
+        "google",
+        "play",
+        "apk",
+        "android",
+        "download",
+        "package",
+        "manager",
+        "oap"
+    ],
+    "author": "Bram van der Veen",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/96aa48/appm/issues"
+    },
+    "homepage": "https://github.com/96aa48/appm#readme"
+}

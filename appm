@@ -1,0 +1,99 @@
+#!/usr/bin/env node
+const exec     = require('child_process').execSync;
+const readline = require('readline')
+    .createInterface({ input: process.stdin, output: process.stdout });
+
+const Google   = require('./Google');
+const Evozi    = require('./Evozi');
+
+const help = _ => {
+    let message = `
+    Usage: appm [COMMAND] QUERY
+
+    Search & download APK from Google Play with QUERY
+
+    Where COMMAND is:
+        search     --  Search through the Google Play app database
+        download   --  Search and download an app from Google Play
+        install    --  Search, download and install an app from Google Play
+
+
+    NOTE: using install requires adb (Android commandline tools)
+    `;
+
+    console.log(message);
+
+    process.exit();
+}
+
+const yarg = _ => {
+    let argv = process.argv;
+    argv.splice(0, 2);
+
+    let command   = (argv[0] || '').toLowerCase();
+    let parameter = (argv.splice(1, argv.length) || []).join(' ').toLowerCase();
+
+    let validCommands = [
+        'search',
+        'download',
+        'install'
+    ];
+
+    command === 'help' && help();
+
+    (command && validCommands.filter(valid => valid === command).length)
+        || console.warn('Invalid command!\nSee appm help for more information.')
+        || process.exit();
+    parameter
+        || console.warn('You didn\'t specify a parameter!\nSee appm help for more information.')
+        || process.exit();
+
+    return {command, parameter};
+}
+
+async function prompt(text) {
+    return new Promise(
+        resolve => {
+            readline.question(
+                text, answer => {
+                    answer = parseInt(answer);
+                    if (isNaN(answer)) {
+                        console.error('You didn\'t specify a valid number');
+                    } else {
+                        resolve(parseInt(answer));
+                    }
+                    readline.close();
+                }
+            );
+        }
+    )
+}
+
+(async function() {
+    let args   = yarg();
+    let list   = await Google.query(args.parameter);
+    let output = list.map(
+        (entry, index) => `[${index}] ${entry.title}`
+    ).join('\n');
+
+    console.log(output);
+
+    args.command === 'search' && process.exit();
+
+    let answer   = await prompt('> Select the package you want to download : ');
+    let metadata = await Evozi.request(list[answer]);
+
+    await Evozi.download(metadata, args);
+
+    args.command === 'download' && process.exit();
+
+    try {
+        exec(`adb start-server && adb install ./${metadata.packagename}.apk && adb kill-server`);
+    } catch(error) {
+        if (error.stderr.toString().match('command not found')) {
+            console.error('If adb is not found, please install Android commandline tools or add them to your PATH');
+        } else {
+            console.error('Seems like adb ran into some trouble\n', error.stderr.toString());
+        }
+    }
+})();
