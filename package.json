@@ -1,5 +1,5 @@
 {
-    "name": "appm",
+    "name": "app-package-manager",
     "version": "1.0.0",
     "description": "An app package manager for Google Play",
     "main": "apm",

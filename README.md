@@ -4,7 +4,7 @@ A package manager for Google Play APK's downloaded through Evozi, and installed 
 
 ## Install :
 ```
-npm i -g appm
+npm i -g app-package-manager
 ```
 
 ## Usage :
