@@ -33,6 +33,8 @@ class Evozi {
 
     static async request(data) {
         let info = await Evozi.prerequest();
+
+
         return new Promise(
             resolve => {
                 let post = {};
@@ -59,7 +61,8 @@ class Evozi {
                     }
                 };
 
-                let req = http.request(
+
+                let req = https.request(
                     options,
                     res => {
                         var _data = [];
